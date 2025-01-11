@@ -389,4 +389,9 @@ public class Grid : MonoBehaviour
         }
         UpdateTextScore(-turnScore);
     }
+
+    public void Restart()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+    }
 }
