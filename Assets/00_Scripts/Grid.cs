@@ -114,7 +114,6 @@ public class Grid : MonoBehaviour
                 if (Rows[i].Cells[idx].tile.canMerge)
                 {
                     Rows[i].Cells[idx].tile.parent = Rows[i].Cells[n];
-                    Rows[i].Cells[idx].tile.index = new Vector2Int(i, n);
                     Rows[i].Cells[idx].tile.Moving();
                     if (idx != n)
                     {
@@ -124,7 +123,6 @@ public class Grid : MonoBehaviour
                 }
                 else
                 {
-                    Rows[i].Cells[idx].tile.index = new Vector2Int(i, n + 1);
                     Rows[i].Cells[idx].tile.Moving();
                     Tile a = Rows[i].Cells[idx].tile;
                     Rows[i].Cells[idx].tile = null;
@@ -174,7 +172,6 @@ public class Grid : MonoBehaviour
                 if (Rows[i].Cells[idx].tile.canMerge)
                 {
                     Rows[i].Cells[idx].tile.parent = Rows[i].Cells[n];
-                    Rows[i].Cells[idx].tile.index = new Vector2Int(i, n);
                     Rows[i].Cells[idx].tile.Moving();
                     if (idx != n)
                     {
@@ -184,7 +181,6 @@ public class Grid : MonoBehaviour
                 }
                 else
                 {
-                    Rows[i].Cells[idx].tile.index = new Vector2Int(i, n - 1);
                     Rows[i].Cells[idx].tile.Moving();
                     Tile a = Rows[i].Cells[idx].tile;
                     Rows[i].Cells[idx].tile = null;
@@ -235,7 +231,6 @@ public class Grid : MonoBehaviour
                 if (Rows[idx].Cells[i].tile.canMerge)
                 {
                     Rows[idx].Cells[i].tile.parent = Rows[n].Cells[i];
-                    Rows[idx].Cells[i].tile.index = new Vector2Int(n, i);
                     Rows[idx].Cells[i].tile.Moving();
                     if (idx != n)
                     {
@@ -245,7 +240,6 @@ public class Grid : MonoBehaviour
                 }
                 else
                 {
-                    Rows[idx].Cells[i].tile.index = new Vector2Int(n - 1, i);
                     Rows[idx].Cells[i].tile.Moving();
                     Tile a = Rows[idx].Cells[i].tile;
                     Rows[idx].Cells[i].tile = null;
@@ -295,7 +289,6 @@ public class Grid : MonoBehaviour
                 if (Rows[idx].Cells[i].tile.canMerge)
                 {
                     Rows[idx].Cells[i].tile.parent = Rows[n].Cells[i];
-                    Rows[idx].Cells[i].tile.index = new Vector2Int(n, i);
                     Rows[idx].Cells[i].tile.Moving();
                     if (idx != n)
                     {
@@ -305,8 +298,6 @@ public class Grid : MonoBehaviour
                 }
                 else
                 {
-
-                    Rows[idx].Cells[i].tile.index = new Vector2Int(n + 1, i);
                     Rows[idx].Cells[i].tile.Moving();
                     Tile a = Rows[idx].Cells[i].tile;
                     Rows[idx].Cells[i].tile = null;

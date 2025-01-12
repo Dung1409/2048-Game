@@ -10,7 +10,6 @@ public class Tile : MonoBehaviour
     public List<TileState> tileStates = new List<TileState>(); 
     public int value;
     public TileState state;
-    public Vector2Int index;
     public Cell parent;
 
     public bool canMerge;

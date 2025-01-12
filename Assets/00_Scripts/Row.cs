@@ -13,10 +13,12 @@ public class Row : MonoBehaviour
         for (int i = 0; i < Cells.Count; i++) {
             Vector2Int pos = new Vector2Int(row, i);
             Cells[i].pos = new Vector2Int(row, i);
+            /*
             if (Cells[i].tile != null ) 
             {
                 Cells[i].tile.index = pos;
             }
+            */
         }
     }
 

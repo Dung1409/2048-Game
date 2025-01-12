@@ -22,7 +22,7 @@ public class Cell : MonoBehaviour
         {
             tile = this.GetComponentInChildren<Tile>();
             tile.parent = this;
-            tile.index = pos;
+            //tile.index = pos;
 
         }
         catch (System.Exception ex)
