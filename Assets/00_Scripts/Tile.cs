@@ -13,10 +13,9 @@ public class Tile : MonoBehaviour
     public Cell parent;
 
     public bool canMerge;
-    void Start()
+    void Awake()
     {
         this.GetComponent<Image>().color = state.backgroundColor;
-        value = 2;
         canMerge = true;
     }
 
