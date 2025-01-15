@@ -10,18 +10,17 @@ public class Cell : MonoBehaviour
 
     public int oldValue;
 
-    private void Start()    
+    private void Awake()    
     {
         AddTile();
-        oldValue = 0;  
+        oldValue = 0;
+        
     }
 
     public void AddTile()
     {
         try
         {
-            tile = this.GetComponentInChildren<Tile>();
-            tile.parent = this;
             //tile.index = pos;
 
         }
@@ -60,5 +59,19 @@ public class Cell : MonoBehaviour
             t.ChangeState();
         }
     }
+
+    public void Restart()
+    {
+        if(tile == null)
+        {
+            oldValue = 0;
+            return;
+        }
+        oldValue = tile.value;
+        tile.parent = null;
+        tile.gameObject.SetActive(false);
+        tile = null;
+    }
+
 }
 
