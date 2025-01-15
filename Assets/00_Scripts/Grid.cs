@@ -17,8 +17,13 @@ public class Grid : MonoBehaviour
     [SerializeField] int turnScore;
     [SerializeField] private TextMeshProUGUI ScoreText;
     [SerializeField] int maxValue;
-    private void Start()
+
+    [SerializeField] GameObject StartButton;
+
+    bool start;
+    private void Awake()
     {
+        start = false;
         if (_intant == null)
         {
             _intant = this;
@@ -27,14 +32,20 @@ public class Grid : MonoBehaviour
         {
             Destroy(this);
         }
+        
+        Rows = this.GetComponentsInChildren<Row>().ToList();
+    }
+
+    private void Start()
+    {
         Score = 0;
         ScoreText.text = Score.ToString();
-        Rows = this.GetComponentsInChildren<Row>().ToList();
         maxValue = 2;
         turnScore = 0;
-        foreach(Row r in Rows)
+        foreach (Row r in Rows)
         {
-            foreach(Cell c in r.Cells) {
+            foreach (Cell c in r.Cells)
+            {
                 if (c.tile != null)
                 {
                     maxValue = Mathf.Max(maxValue, c.tile.value);
@@ -45,35 +56,37 @@ public class Grid : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        if (!StartButton.activeSelf)
         {
-            turnScore = 0;
-            MoveRight();
-        }
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                turnScore = 0;
+                MoveRight();
+            }
 
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            turnScore = 0;
-            MoveLeft();
-        }
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            turnScore = 0;
-            MoveUp();
-        }
+            else if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                turnScore = 0;
+                MoveLeft();
+            }
+            else if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                turnScore = 0;
+                MoveUp();
+            }
 
-        else if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            turnScore = 0;
-            MoveDown();
-        }
+            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                turnScore = 0;
+                MoveDown();
+            }
 
-        if(maxValue == 2048)
-        {
-            Time.timeScale = 0;
-            Debug.Log("You win");
+            if (maxValue == 2048)
+            {
+                Time.timeScale = 0;
+                Debug.Log("You win");
+            }
         }
-
     }
 
     public void MoveRight()
@@ -94,7 +107,7 @@ public class Grid : MonoBehaviour
                         if (Rows[i].Cells[j].tile.value == top.value && top.canMerge == true)
                         {
                             top.value *= 2;
-                            maxValue = Mathf.Max(maxValue , top.value);
+                            maxValue = Mathf.Max(maxValue, top.value);
                             UpdateTextScore(top.value);
                             top.ChangeState();
                             Rows[i].Cells[j].tile.canMerge = false;
@@ -145,7 +158,7 @@ public class Grid : MonoBehaviour
             {
                 if (Rows[i].Cells[j].tile != null)
                 {
-                    Rows[i].Cells[j].oldValue = Rows[i].Cells[j].tile.value;  
+                    Rows[i].Cells[j].oldValue = Rows[i].Cells[j].tile.value;
                     Rows[i].Cells[j].tile.canMerge = true;
                     if (q.Count != 0)
                     {
@@ -166,7 +179,8 @@ public class Grid : MonoBehaviour
                     Rows[i].Cells[j].oldValue = 0;
                 }
             }
-            while (q.Count > 0) {
+            while (q.Count > 0)
+            {
 
                 int idx = q.Dequeue();
                 if (Rows[i].Cells[idx].tile.canMerge)
@@ -318,14 +332,13 @@ public class Grid : MonoBehaviour
             Cell c = Rows[index].CellEmpty();
             if (c != null)
             {
-                int value = Random.Range(1, 3);
                 Tile t = CreateTile().GetComponent<Tile>();
                 t.gameObject.SetActive(true);
                 t.parent = c;
                 c.tile = t;
                 t.transform.SetParent(c.transform);
                 t.transform.position = c.transform.position;
-                t.value = value * 2;
+                t.value = Random.Range(1 , 3) * 2;
                 t.ChangeState();
                 return;
             }
@@ -371,11 +384,11 @@ public class Grid : MonoBehaviour
 
     public void Back()
     {
-        foreach(Row r in Rows)
+        foreach (Row r in Rows)
         {
-            foreach(Cell c in r.Cells)
+            foreach (Cell c in r.Cells)
             {
-                c.Back();   
+                c.Back();
             }
         }
         UpdateTextScore(-turnScore);
@@ -383,6 +396,24 @@ public class Grid : MonoBehaviour
 
     public void Restart()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+        Score = 0;
+        turnScore = 0;
+        ScoreText.text = turnScore.ToString();  
+        foreach(Row r in Rows)
+        {
+            foreach (Cell c in r.Cells)
+            {
+                c.Restart();
+            }
+        }
+        StartGame();
     }
+
+    public void StartGame()
+    {
+        ShowTile();
+        ShowTile();
+        StartButton.SetActive(false);   
+    }
+
 }
