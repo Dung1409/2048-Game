@@ -10,10 +10,6 @@ public class Row : MonoBehaviour
     {
         int row = Grid.intant.Rows.IndexOf(this);   
         Cells = this.GetComponentsInChildren<Cell>().ToList();
-        for (int i = 0; i < Cells.Count; i++) {
-            Vector2Int pos = new Vector2Int(row, i);
-            Cells[i].pos = new Vector2Int(row, i);
-        }
     }
 
     public Cell CellEmpty()

@@ -74,8 +74,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4293322495
+  m_fontColor: {r: 1, g: 0.9025157, b: 0.9025157, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -92,13 +92,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 4096
   m_textAlignment: 65535
@@ -237,6 +237,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7c73c5ebb7c12114b9084072c845fd06, type: 2}
   value: 2
   state: {fileID: 11400000, guid: c75df0f5d4bb3ca4aa2412273eae8f7d, type: 2}
-  index: {x: 0, y: 0}
   parent: {fileID: 0}
   canMerge: 1

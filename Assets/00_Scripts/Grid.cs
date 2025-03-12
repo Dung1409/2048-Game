@@ -18,12 +18,11 @@ public class Grid : MonoBehaviour
     [SerializeField] private TextMeshProUGUI ScoreText;
     [SerializeField] int maxValue;
 
-    [SerializeField] GameObject StartButton;
-
-    bool start;
+    [SerializeField] private GameObject StartButton;
+    [SerializeField] private GameObject notify;
+    int max;
     private void Awake()
     {
-        start = false;
         if (_intant == null)
         {
             _intant = this;
@@ -32,8 +31,12 @@ public class Grid : MonoBehaviour
         {
             Destroy(this);
         }
-        
+        max = Contant.max;
         Rows = this.GetComponentsInChildren<Row>().ToList();
+
+        Observer.AddListener(Contant.Win , Win);
+        Observer.AddListener(Contant.GameOver, GameOver);
+        Observer.AddListener(Contant.Restart , Restart);  
     }
 
     private void Start()
@@ -52,12 +55,19 @@ public class Grid : MonoBehaviour
                 }
             }
         }
+        notify.SetActive(false);
     }
 
     private void Update()
     {
         if (!StartButton.activeSelf)
         {
+            if (maxValue == 2048)
+            {
+                Observer.Notify(Contant.Win);
+                return;
+            }
+
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
                 turnScore = 0;
@@ -80,65 +90,68 @@ public class Grid : MonoBehaviour
                 turnScore = 0;
                 MoveDown();
             }
-
-            if (maxValue == 2048)
-            {
-                Time.timeScale = 0;
-                Debug.Log("You win");
-            }
         }
     }
-
-    public void MoveRight()
+    #region
+    public void MoveTiles(Vector2Int direction)
     {
-        for (int i = 0; i <= 3; i++)
+        bool isHorizontal = direction.y == 0;
+        for (int i = 0; i < max; i++)
         {
             Queue<int> q = new Queue<int>();
-            int n = 3;
+            int n = (direction.x == 1 || direction.y == 1) ? max - 1 : 0;
             Tile top = null;
-            for (int j = 3; j >= 0; j--)
+
+            for (int j = (direction.x == 1 || direction.y == 1) ? max - 1 : 0;
+                 (direction.x == 1 || direction.y == 1) ? j >= 0 : j < max;
+                 j += (direction.x == 1 || direction.y == 1) ? -1 : 1)
             {
-                if (Rows[i].Cells[j].tile != null)
+                Cell cell = isHorizontal ? Rows[i].Cells[j] : Rows[j].Cells[i];
+                if (cell.tile != null)
                 {
-                    Rows[i].Cells[j].oldValue = Rows[i].Cells[j].tile.value;
-                    Rows[i].Cells[j].tile.canMerge = true;
+                    cell.oldValue = cell.tile.value;
+                    cell.tile.canMerge = true;
                     if (q.Count != 0)
                     {
-                        if (Rows[i].Cells[j].tile.value == top.value && top.canMerge == true)
+                        if (cell.tile.value == top.value && top.canMerge)
                         {
                             top.value *= 2;
                             maxValue = Mathf.Max(maxValue, top.value);
                             UpdateTextScore(top.value);
                             top.ChangeState();
-                            Rows[i].Cells[j].tile.canMerge = false;
+                            cell.tile.canMerge = false;
                         }
                     }
-                    top = Rows[i].Cells[j].tile;
+                    top = cell.tile;
                     q.Enqueue(j);
                 }
                 else
                 {
-                    Rows[i].Cells[j].oldValue = 0;
+                    cell.oldValue = 0;
                 }
             }
+
             while (q.Count > 0)
             {
                 int idx = q.Dequeue();
-                if (Rows[i].Cells[idx].tile.canMerge)
+                Cell currentCell = isHorizontal ? Rows[i].Cells[idx] : Rows[idx].Cells[i];
+                Cell targetCell = isHorizontal ? Rows[i].Cells[n] : Rows[n].Cells[i];
+
+                if (currentCell.tile.canMerge)
                 {
-                    Rows[i].Cells[idx].tile.parent = Rows[i].Cells[n];
-                    Rows[i].Cells[idx].tile.Moving();
+                    currentCell.tile.parent = targetCell;
+                    currentCell.tile.Moving();
                     if (idx != n)
                     {
-                        Rows[i].Cells[idx].tile = null;
+                        currentCell.tile = null;
                     }
-                    n--;
+                    n += (direction.x == 1 || direction.y == 1) ? -1 : 1;
                 }
                 else
                 {
-                    Rows[i].Cells[idx].tile.Moving();
-                    Tile a = Rows[i].Cells[idx].tile;
-                    Rows[i].Cells[idx].tile = null;
+                    currentCell.tile.Moving();
+                    Tile a = currentCell.tile;
+                    currentCell.tile = null;
                     poolTile.Add(a);
                     a.gameObject.SetActive(false);
                 }
@@ -147,182 +160,12 @@ public class Grid : MonoBehaviour
         StartCoroutine(SpawnTile());
     }
 
-    public void MoveLeft()
-    {
-        for (int i = 0; i <= 3; i++)
-        {
-            Queue<int> q = new Queue<int>();
-            int n = 0;
-            Tile top = null;
-            for (int j = 0; j <= 3; j++)
-            {
-                if (Rows[i].Cells[j].tile != null)
-                {
-                    Rows[i].Cells[j].oldValue = Rows[i].Cells[j].tile.value;
-                    Rows[i].Cells[j].tile.canMerge = true;
-                    if (q.Count != 0)
-                    {
-                        if (Rows[i].Cells[j].tile.value == top.value && top.canMerge == true)
-                        {
-                            top.value *= 2;
-                            maxValue = Mathf.Max(maxValue, top.value);
-                            UpdateTextScore(top.value);
-                            top.ChangeState();
-                            Rows[i].Cells[j].tile.canMerge = false;
-                        }
-                    }
-                    top = Rows[i].Cells[j].tile;
-                    q.Enqueue(j);
-                }
-                else
-                {
-                    Rows[i].Cells[j].oldValue = 0;
-                }
-            }
-            while (q.Count > 0)
-            {
-
-                int idx = q.Dequeue();
-                if (Rows[i].Cells[idx].tile.canMerge)
-                {
-                    Rows[i].Cells[idx].tile.parent = Rows[i].Cells[n];
-                    Rows[i].Cells[idx].tile.Moving();
-                    if (idx != n)
-                    {
-                        Rows[i].Cells[idx].tile = null;
-                    }
-                    n++;
-                }
-                else
-                {
-                    Rows[i].Cells[idx].tile.Moving();
-                    Tile a = Rows[i].Cells[idx].tile;
-                    Rows[i].Cells[idx].tile = null;
-                    poolTile.Add(a);
-                    a.gameObject.SetActive(false);
-                }
-            }
-
-        }
-        StartCoroutine(SpawnTile());
-    }
-
-    public void MoveUp()
-    {
-        for (int i = 0; i <= 3; i++)
-        {
-            Queue<int> q = new Queue<int>();
-            Tile top = null;
-            for (int j = 0; j <= 3; j++)
-            {
-                if (Rows[j].Cells[i].tile != null)
-                {
-                    Rows[j].Cells[i].oldValue = Rows[j].Cells[i].tile.value;
-                    Rows[j].Cells[i].tile.canMerge = true;
-                    if (q.Count != 0)
-                    {
-                        if (Rows[j].Cells[i].tile.value == top.value && top.canMerge == true)
-                        {
-                            top.value *= 2;
-                            maxValue = Mathf.Max(maxValue, top.value);
-                            UpdateTextScore(top.value);
-                            top.ChangeState();
-                            Rows[j].Cells[i].tile.canMerge = false;
-                        }
-                    }
-                    top = Rows[j].Cells[i].tile;
-                    q.Enqueue(j);
-                }
-                else
-                {
-                    Rows[j].Cells[i].oldValue = 0;
-                }
-            }
-            int n = 0;
-            while (q.Count > 0)
-            {
-                int idx = q.Dequeue();
-                if (Rows[idx].Cells[i].tile.canMerge)
-                {
-                    Rows[idx].Cells[i].tile.parent = Rows[n].Cells[i];
-                    Rows[idx].Cells[i].tile.Moving();
-                    if (idx != n)
-                    {
-                        Rows[idx].Cells[i].tile = null;
-                    }
-                    n++;
-                }
-                else
-                {
-                    Rows[idx].Cells[i].tile.Moving();
-                    Tile a = Rows[idx].Cells[i].tile;
-                    Rows[idx].Cells[i].tile = null;
-                    poolTile.Add(a);
-                    a.gameObject.SetActive(false);
-                }
-            }
-        }
-        StartCoroutine(SpawnTile());
-    }
-
-    public void MoveDown()
-    {
-        for (int i = 0; i <= 3; i++)
-        {
-            Queue<int> q = new Queue<int>();
-            Tile top = null;
-            for (int j = 3; j >= 0; j--)
-            {
-                if (Rows[j].Cells[i].tile != null)
-                {
-                    Rows[j].Cells[i].oldValue = Rows[j].Cells[i].tile.value;
-                    Rows[j].Cells[i].tile.canMerge = true;
-                    if (q.Count != 0)
-                    {
-                        if (Rows[j].Cells[i].tile.value == top.value && top.canMerge == true)
-                        {
-                            top.value *= 2;
-                            maxValue = Mathf.Max(maxValue, top.value);
-                            UpdateTextScore(top.value);
-                            top.ChangeState();
-                            Rows[j].Cells[i].tile.canMerge = false;
-                        }
-                    }
-                    top = Rows[j].Cells[i].tile;
-                    q.Enqueue(j);
-                }
-                else
-                {
-                    Rows[j].Cells[i].oldValue = 0;
-                }
-            }
-            int n = 3;
-            while (q.Count > 0)
-            {
-                int idx = q.Dequeue();
-                if (Rows[idx].Cells[i].tile.canMerge)
-                {
-                    Rows[idx].Cells[i].tile.parent = Rows[n].Cells[i];
-                    Rows[idx].Cells[i].tile.Moving();
-                    if (idx != n)
-                    {
-                        Rows[idx].Cells[i].tile = null;
-                    }
-                    n--;
-                }
-                else
-                {
-                    Rows[idx].Cells[i].tile.Moving();
-                    Tile a = Rows[idx].Cells[i].tile;
-                    Rows[idx].Cells[i].tile = null;
-                    poolTile.Add(a);
-                    a.gameObject.SetActive(false);
-                }
-            }
-        }
-        StartCoroutine(SpawnTile());
-    }
-
+    public void MoveLeft() => MoveTiles(new Vector2Int(-1, 0));
+    public void MoveRight() => MoveTiles(new Vector2Int(1, 0));
+    public void MoveUp() => MoveTiles(new Vector2Int(0, -1));
+    public void MoveDown() => MoveTiles(new Vector2Int(0, 1));
+    #endregion
+       
     public void ShowTile()
     {
         int index = Random.Range(0, 3);
@@ -351,21 +194,19 @@ public class Grid : MonoBehaviour
                 }
                 if (index == startIndex)
                 {
-                    UnityEngine.Debug.Log("Game Over");
+                     Observer.Notify(Contant.GameOver);
                     return;
                 }
             }
         }
 
     }
-
     public void UpdateTextScore(int value)
     {
         turnScore += value;
         Score += value;
         ScoreText.text = Score.ToString();
     }
-
     public GameObject CreateTile()
     {
         foreach (Tile t in poolTile)
@@ -381,7 +222,6 @@ public class Grid : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         ShowTile();
     }
-
     public void Back()
     {
         foreach (Row r in Rows)
@@ -393,12 +233,12 @@ public class Grid : MonoBehaviour
         }
         UpdateTextScore(-turnScore);
     }
-
     public void Restart()
     {
         Score = 0;
         turnScore = 0;
-        ScoreText.text = turnScore.ToString();  
+        ScoreText.text = turnScore.ToString();
+        this.enabled = true;    
         foreach(Row r in Rows)
         {
             foreach (Cell c in r.Cells)
@@ -408,12 +248,23 @@ public class Grid : MonoBehaviour
         }
         StartGame();
     }
-
     public void StartGame()
     {
         ShowTile();
         ShowTile();
-        StartButton.SetActive(false);   
+        StartButton.SetActive(false);
+        notify.SetActive(false);    
     }
+
+    #region
+    public void Notify(string message)
+    {
+        notify.SetActive(true); 
+        notify.GetComponentInChildren<TextMeshProUGUI>().text = message;
+        this.enabled = false;
+    }
+    public void Win() => Notify(Contant.Win);
+    public void GameOver() => Notify(Contant.GameOver);
+    #endregion
 
 }

@@ -21,7 +21,8 @@ public class Cell : MonoBehaviour
     {
         try
         {
-            //tile.index = pos;
+            tile = this.GetComponentInChildren<Tile>();
+            tile.parent = this;
 
         }
         catch (System.Exception ex)

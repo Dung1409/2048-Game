@@ -12,9 +12,13 @@ public class Tile : MonoBehaviour
     public TileState state;
     public Cell parent;
 
+    private TextMeshProUGUI text; 
+
     public bool canMerge;
     void Awake()
     {
+        text = this.GetComponentInChildren<TextMeshProUGUI>();
+        text.color = state.textColor;
         this.GetComponent<Image>().color = state.backgroundColor;
         canMerge = true;
     }
@@ -24,6 +28,7 @@ public class Tile : MonoBehaviour
     {
         StartCoroutine(move());
     }
+
     IEnumerator move()
     {
         
@@ -51,6 +56,7 @@ public class Tile : MonoBehaviour
         int idx = (int) Mathf.Log(value , 2) - 1;
         state = tileStates[idx];
         this.GetComponent<Image>().color = state.backgroundColor;
-        this.GetComponentInChildren<TextMeshProUGUI>().text = value.ToString();
+        text.text = value.ToString();
+        text.color = state.textColor;
     }
 }
