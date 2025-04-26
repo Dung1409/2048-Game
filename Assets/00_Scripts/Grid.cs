@@ -34,9 +34,12 @@ public class Grid : MonoBehaviour
         max = Contant.max;
         Rows = this.GetComponentsInChildren<Row>().ToList();
 
-        Observer.AddListener(Contant.Win , Win);
+        Observer.AddListener(Contant.Win, Win);
         Observer.AddListener(Contant.GameOver, GameOver);
-        Observer.AddListener(Contant.Restart , Restart);  
+
+        Observer.AddListener(Contant.Restart, Restart);
+        Observer.AddListener(Contant.StartGame, StartGame);
+        Observer.AddListener(Contant.Undo , Undo);
     }
 
     private void Start()
@@ -70,24 +73,20 @@ public class Grid : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
-                turnScore = 0;
                 MoveRight();
             }
 
             else if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                turnScore = 0;
                 MoveLeft();
             }
             else if (Input.GetKeyDown(KeyCode.UpArrow))
             {
-                turnScore = 0;
                 MoveUp();
             }
 
             else if (Input.GetKeyDown(KeyCode.DownArrow))
             {
-                turnScore = 0;
                 MoveDown();
             }
         }
@@ -157,6 +156,7 @@ public class Grid : MonoBehaviour
                 }
             }
         }
+        turnScore = 0;
         StartCoroutine(SpawnTile());
     }
 
@@ -165,7 +165,7 @@ public class Grid : MonoBehaviour
     public void MoveUp() => MoveTiles(new Vector2Int(0, -1));
     public void MoveDown() => MoveTiles(new Vector2Int(0, 1));
     #endregion
-       
+
     public void ShowTile()
     {
         int index = Random.Range(0, 3);
@@ -181,7 +181,7 @@ public class Grid : MonoBehaviour
                 c.tile = t;
                 t.transform.SetParent(c.transform);
                 t.transform.position = c.transform.position;
-                t.value = Random.Range(1 , 3) * 2;
+                t.value = Random.Range(1, 3) * 2;
                 t.ChangeState();
                 return;
             }
@@ -194,13 +194,14 @@ public class Grid : MonoBehaviour
                 }
                 if (index == startIndex)
                 {
-                     Observer.Notify(Contant.GameOver);
+                    GameOver();
                     return;
                 }
             }
         }
 
     }
+
     public void UpdateTextScore(int value)
     {
         turnScore += value;
@@ -219,16 +220,16 @@ public class Grid : MonoBehaviour
     }
     IEnumerator SpawnTile()
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.2f);
         ShowTile();
     }
-    public void Back()
+    public void Undo()
     {
         foreach (Row r in Rows)
         {
             foreach (Cell c in r.Cells)
             {
-                c.Back();
+                c.Undo();
             }
         }
         UpdateTextScore(-turnScore);
@@ -238,8 +239,8 @@ public class Grid : MonoBehaviour
         Score = 0;
         turnScore = 0;
         ScoreText.text = turnScore.ToString();
-        this.enabled = true;    
-        foreach(Row r in Rows)
+        this.enabled = true;
+        foreach (Row r in Rows)
         {
             foreach (Cell c in r.Cells)
             {
@@ -253,13 +254,13 @@ public class Grid : MonoBehaviour
         ShowTile();
         ShowTile();
         StartButton.SetActive(false);
-        notify.SetActive(false);    
+        notify.SetActive(false);
     }
 
     #region
     public void Notify(string message)
     {
-        notify.SetActive(true); 
+        notify.SetActive(true);
         notify.GetComponentInChildren<TextMeshProUGUI>().text = message;
         this.enabled = false;
     }

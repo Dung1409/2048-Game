@@ -7,8 +7,7 @@ public class Row : MonoBehaviour
 {
     public  List<Cell> Cells = new List<Cell>();
     private void Start()
-    {
-        int row = Grid.intant.Rows.IndexOf(this);   
+    {   
         Cells = this.GetComponentsInChildren<Cell>().ToList();
     }
 

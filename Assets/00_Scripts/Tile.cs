@@ -7,22 +7,20 @@ using UnityEngine.UI;
 
 public class Tile : MonoBehaviour
 {
-    public List<TileState> tileStates = new List<TileState>(); 
-    public int value;
+    public List<TileState> tileStates = new List<TileState>();
+    public int value ;
     public TileState state;
     public Cell parent;
 
-    private TextMeshProUGUI text; 
+    [SerializeField] private TextMeshProUGUI text;
 
     public bool canMerge;
     void Awake()
     {
-        text = this.GetComponentInChildren<TextMeshProUGUI>();
-        text.color = state.textColor;
-        this.GetComponent<Image>().color = state.backgroundColor;
+        text = GetComponentInChildren<TextMeshProUGUI>();
+        ChangeState();
         canMerge = true;
     }
-
 
     public void Moving()
     {
@@ -31,12 +29,12 @@ public class Tile : MonoBehaviour
 
     IEnumerator move()
     {
-        
-        if(parent.tile == null)
+
+        if (parent.tile == null)
         {
             parent.tile = this;
         }
-        
+
         this.transform.SetParent(parent.transform);
         float elapsed = 0f;
         float duration = 0.1f;
@@ -46,14 +44,14 @@ public class Tile : MonoBehaviour
         {
             transform.position = Vector3.Lerp(from, to, elapsed / duration);
             elapsed += Time.deltaTime;
-            yield return null;  
+            yield return null;
         }
         this.transform.position = parent.transform.position;
     }
 
     public void ChangeState()
     {
-        int idx = (int) Mathf.Log(value , 2) - 1;
+        int idx = (int)Mathf.Log(value, 2) - 1;
         state = tileStates[idx];
         this.GetComponent<Image>().color = state.backgroundColor;
         text.text = value.ToString();

@@ -7,31 +7,13 @@ public class Cell : MonoBehaviour
 {
     public Tile tile;
     public Vector2Int pos;
-
     public int oldValue;
-
     private void Awake()    
     {
         AddTile();
         oldValue = 0;
-        
     }
-
-    public void AddTile()
-    {
-        try
-        {
-            tile = this.GetComponentInChildren<Tile>();
-            tile.parent = this;
-
-        }
-        catch (System.Exception ex)
-        {
-            tile = null;
-        }
-    }
-
-    public void Back()
+    public void Undo()
     {
         if(oldValue == 0)
         {
@@ -60,6 +42,19 @@ public class Cell : MonoBehaviour
             t.ChangeState();
         }
     }
+    public void AddTile()
+    {
+        try
+        {
+            tile = this.GetComponentInChildren<Tile>();
+            tile.parent = this;
+
+        }
+        catch (System.Exception ex)
+        {
+            tile = null;
+        }
+    }
 
     public void Restart()
     {
@@ -73,6 +68,5 @@ public class Cell : MonoBehaviour
         tile.gameObject.SetActive(false);
         tile = null;
     }
-
 }
 
