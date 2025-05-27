@@ -7,4 +7,6 @@ public class Contant
     public static string Restart = "Restart";
     public static string StartGame = "StartGame";
     public static string Undo = "Undo";
+    public static string BoardData = "Broad Data";
+    public static string Score = "Score";
 }

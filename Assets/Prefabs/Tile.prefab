@@ -236,6 +236,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9a455eda9e7487e4d9e161a8829078b5, type: 2}
   - {fileID: 11400000, guid: 7c73c5ebb7c12114b9084072c845fd06, type: 2}
   value: 2
-  state: {fileID: 11400000, guid: c75df0f5d4bb3ca4aa2412273eae8f7d, type: 2}
+  state: {fileID: 0}
   parent: {fileID: 0}
+  text: {fileID: 0}
   canMerge: 1

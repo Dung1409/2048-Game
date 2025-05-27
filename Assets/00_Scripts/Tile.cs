@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -8,13 +9,16 @@ using UnityEngine.UI;
 public class Tile : MonoBehaviour
 {
     public List<TileState> tileStates = new List<TileState>();
-    public int value ;
+    public int value;
     public TileState state;
     public Cell parent;
+    public bool canMerge;
 
     [SerializeField] private TextMeshProUGUI text;
-
-    public bool canMerge;
+    public Dictionary<Vector2Int, bool> dir = new Dictionary<Vector2Int, bool>() {  {Vector2Int.right,  true},
+                                                                                    {Vector2Int.left,   true},
+                                                                                    {Vector2Int.up,     true}, 
+                                                                                    {Vector2Int.down,   true}};
     void Awake()
     {
         text = GetComponentInChildren<TextMeshProUGUI>();
@@ -56,5 +60,13 @@ public class Tile : MonoBehaviour
         this.GetComponent<Image>().color = state.backgroundColor;
         text.text = value.ToString();
         text.color = state.textColor;
+    }
+
+    public void checkDir()
+    {
+        List<Vector2Int> key = dir.Keys.ToList();
+        foreach(var k in key){
+            
+        }
     }
 }

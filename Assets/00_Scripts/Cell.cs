@@ -8,6 +8,7 @@ public class Cell : MonoBehaviour
     public Tile tile;
     public Vector2Int pos;
     public int oldValue;
+    
     private void Awake()    
     {
         AddTile();
