@@ -9,4 +9,5 @@ public class Contant
     public static string Undo = "Undo";
     public static string BoardData = "Broad Data";
     public static string Score = "Score";
+    public static string Row = "Row";
 }

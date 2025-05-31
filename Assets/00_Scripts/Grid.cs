@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Grid : MonoBehaviour
 {
     private static Grid _intant;
     public static Grid intant => _intant;
-
-    int maxValue;
+    public int maxValue;
     public int maxRow;
 
     public List<Row> Rows = new List<Row>();
@@ -25,12 +25,21 @@ public class Grid : MonoBehaviour
         {
             Destroy(this);
         }
-
         maxRow = Contant.max;
         Rows = this.GetComponentsInChildren<Row>().ToList();
         maxValue = 2;
     }
 
+    private void Start()
+    {
+        if (PlayerPrefs.HasKey(Contant.BoardData + Contant.max.ToString()))
+        {
+            LoadBoard();
+            return;
+        }
+        ShowTile();
+        ShowTile();
+    }
     private void Update()
     {
         Play();
@@ -38,30 +47,27 @@ public class Grid : MonoBehaviour
 
     public void Play()
     {
-        if (!UIManager.intant.StartButton.activeSelf || UIManager.intant.Notify.gameObject.activeSelf)
+        if (maxValue == 2048)
         {
-            if (maxValue == 2048)
-            {
-                UIManager.intant.Message(Contant.Win);
-                return;
-            }
+            UIManager.intant.Message(Contant.Win);
+            return;
+        }
 
-            if (Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                MoveTiles(new Vector2Int(1, 0));
-            }
-            else if (Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                MoveTiles(new Vector2Int(-1, 0));
-            }
-            else if (Input.GetKeyDown(KeyCode.UpArrow))
-            {
-                MoveTiles(new Vector2Int(0, -1));
-            }
-            else if (Input.GetKeyDown(KeyCode.DownArrow))
-            {
-                MoveTiles(new Vector2Int(0, 1));
-            }
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            MoveTiles(new Vector2Int(1, 0));
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            MoveTiles(new Vector2Int(-1, 0));
+        }
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            MoveTiles(new Vector2Int(0, -1));
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            MoveTiles(new Vector2Int(0, 1));
         }
     }
 
@@ -87,6 +93,7 @@ public class Grid : MonoBehaviour
                         if(cell.tile.value == top.value && top.canMerge)
                         {
                             top.value *= 2;
+                            top.AnimationMerge();
                             top.ChangeState();
                             maxValue = Mathf.Max(maxValue, top.value);
                             ScoreManager.intant.UpdateScore(top.value);
@@ -134,7 +141,7 @@ public class Grid : MonoBehaviour
 
     public void ShowTile()
     {
-        int index = Random.Range(0, 3);
+        int index = Random.Range(0, Contant.max - 1);
         int startIndex = index;
         while (true)
         {
@@ -192,4 +199,17 @@ public class Grid : MonoBehaviour
         t.ChangeState();
     }
 
+    public void LoadBoard()
+    {
+        int n = Contant.max;
+        BoardData boardData = JsonUtility.FromJson<BoardData>(PlayerPrefs.GetString(Contant.BoardData + n.ToString()));
+        for (int i = 0; i < boardData.board.Length; i++)
+        {
+            Cell c = Rows[i / Contant.max].Cells[i % Contant.max];
+            if (boardData.board[i] != 0)
+            {
+               getTile(c, boardData.board[i]);
+            }
+        }
+    }
 }

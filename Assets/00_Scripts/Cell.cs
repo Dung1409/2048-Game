@@ -14,6 +14,19 @@ public class Cell : MonoBehaviour
         AddTile();
         oldValue = 0;
     }
+    public void AddTile()
+    {
+        try
+        {
+            tile = this.GetComponentInChildren<Tile>();
+            tile.parent = this;
+
+        }
+        catch (System.Exception ex)
+        {
+            tile = null;
+        }
+    }
     public void Undo()
     {
         if(oldValue == 0)
@@ -43,20 +56,6 @@ public class Cell : MonoBehaviour
             t.ChangeState();
         }
     }
-    public void AddTile()
-    {
-        try
-        {
-            tile = this.GetComponentInChildren<Tile>();
-            tile.parent = this;
-
-        }
-        catch (System.Exception ex)
-        {
-            tile = null;
-        }
-    }
-
     public void Restart()
     {
         if(tile == null)

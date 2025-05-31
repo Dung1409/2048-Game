@@ -146,6 +146,7 @@ GameObject:
   - component: {fileID: 8738715264168715915}
   - component: {fileID: 6711660577084346107}
   - component: {fileID: 7938873061301191308}
+  - component: {fileID: 519387280708163638}
   m_Layer: 5
   m_Name: Tile
   m_TagString: Untagged
@@ -235,8 +236,33 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5dda986722afe8c458c6d58b4ab375e2, type: 2}
   - {fileID: 11400000, guid: 9a455eda9e7487e4d9e161a8829078b5, type: 2}
   - {fileID: 11400000, guid: 7c73c5ebb7c12114b9084072c845fd06, type: 2}
+  - {fileID: 11400000, guid: 7530d0aab5d157d48a720f288d8bf8aa, type: 2}
+  - {fileID: 11400000, guid: 5409fa96a0e91464095ed687815c6230, type: 2}
+  - {fileID: 11400000, guid: a4c628929c257004780c9dfdff5785b5, type: 2}
   value: 2
-  state: {fileID: 0}
+  pos: {x: 0, y: 0}
+  dataState: {fileID: 0}
   parent: {fileID: 0}
-  text: {fileID: 0}
   canMerge: 1
+  text: {fileID: 0}
+--- !u!95 &519387280708163638
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8721896251361637452}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 1b64dc55f99fb9c41b691fde0d5a3197, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

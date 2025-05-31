@@ -24,7 +24,8 @@ public class ScoreManager : MonoBehaviour
         {
             Destroy(this);
         }
-        highScore = PlayerPrefs.GetInt(Contant.HighScore);
+        score = PlayerPrefs.GetInt(Contant.Score + Contant.max.ToString(), 0);
+        highScore = PlayerPrefs.GetInt(Contant.HighScore + Contant.max.ToString() , 0);
         Debug.Log(highScore);
         UpdateUI();
     }
@@ -37,7 +38,7 @@ public class ScoreManager : MonoBehaviour
         if(score > highScore)
         {
             highScore = score;
-            PlayerPrefs.SetInt(Contant.HighScore ,highScore);
+            PlayerPrefs.SetInt(Contant.HighScore + Contant.max.ToString() ,highScore);
         }
         UpdateUI();
     }

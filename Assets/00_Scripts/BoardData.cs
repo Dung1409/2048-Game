@@ -19,7 +19,8 @@ public class PlayModeExitHandle
 
     private static void OnPlayModeChange(PlayModeStateChange state)
     {
-        if (state == PlayModeStateChange.ExitingPlayMode)
+        int currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
+        if (state == PlayModeStateChange.ExitingPlayMode && currentScene != 0)
         {
             Debug.Log("Exit Play Mode");
             SaveData();
@@ -29,16 +30,15 @@ public class PlayModeExitHandle
     private static void SaveData()
     {
         BoardData currentBoard = new BoardData();
-        int n = Contant.max ;
-        for (int i = 0; i < n * n ; i++)
+        int n = Contant.max;
+        for (int i = 0; i < n * n; i++)
         {
             Cell c = Grid.intant.Rows[i / n].Cells[i % n];
             currentBoard.board[i] = c.tile == null ? 0 : c.tile.value;
         }
         string json = JsonUtility.ToJson(currentBoard);
-        PlayerPrefs.SetString(Contant.BoardData , json);
-        PlayerPrefs.SetInt(Contant.Score, ScoreManager.intant.score);
-        Debug.Log(json);
+        PlayerPrefs.SetString(Contant.BoardData + n.ToString(), json);
+        PlayerPrefs.SetInt(Contant.Score + n.ToString(), ScoreManager.intant.score);
     }
 }
 #endif
