@@ -1,137 +1,296 @@
-# Game Design Document: 2048
+# GAME DESIGN DOCUMENT
 
-## 1. Game Overview
+## Project Information
 
-| Field | Detail |
-|-------|--------|
-| **Title** | 2048 |
-| **Genre** | Puzzle / Number Puzzle / Casual |
-| **Platform** | PC (Unity Standalone) |
-| **Target Audience** | Casual gamers (mọi lứa tuổi), người yêu thích puzzle |
-| **Elevator Pitch** | Gộp các ô số để tạo ra ô 2048 — gameplay đơn giản, gây nghiện, mỗi lượt chỉ mất 30 giây nhưng đủ sức hút để chơi hàng giờ. |
-
-## 2. Core Gameplay
-
-### Core Loop
-1. Người chơi nhấn phím mũi tên → tất cả tile trượt theo hướng đó
-2. Tile cùng giá trị chạm nhau → gộp thành tile gấp đôi
-3. Tile mới (2 hoặc 4) xuất hiện ngẫu nhiên trên ô trống
-4. Tiếp tục cho đến khi đạt 2048 (thắng) hoặc hết nước đi (thua)
-
-### Session Flow
-Menu → chọn kích thước grid (4x4 / 5x5) → gameplay loop → win/game over → restart/home
-
-### Win/Lose Conditions
-- **Win**: tạo được tile 2048
-- **Lose**: không còn ô trống và không còn cặp tile kề nào cùng giá trị
-
-## 3. Progression
-
-- **Horizontal**: mỗi game là một session độc lập, tiến trình là score và high score
-- **Vertical**: kích thước grid tăng dần (4x4 → 5x5) khi người chơi muốn thử thách hơn
-- **Unlock System**: không có — mở khóa ngay từ đầu
-- **Difficulty Curve**: 4x4 dễ tiếp cận; 5x5 kéo dài thời gian game + khó kiểm soát hơn
-
-## 4. Systems Design
-
-### Grid System (`Grid.cs`)
-- Grid là Singleton, chứa `List<Row>`, mỗi Row chứa `List<Cell>`
-- Mỗi Cell giữ reference đến Tile hoặc null
-- Object Pooling qua `poolTile` để tái sử dụng tile, tránh Instantiate/Destroy
-- Move algorithm: duyệt từng hàng/cột theo hướng, dùng Queue để xử lý compact tiles và merge
-
-### Merge System
-- Mỗi tile chỉ merge 1 lần/lượt (`canMerge` flag)
-- Merge xong set `canMerge = false`, tránh merge dây chuyền trong cùng lượt
-- Tile bị merge set active = false (trả về pool)
-
-### Score System (`ScoreManager.cs`)
-- `score`: điểm hiện tại
-- `highScore`: điểm cao nhất mọi lúc (lưu PlayerPrefs)
-- `turnScore`: điểm kiếm trong lượt hiện tại (dùng cho Undo)
-- Merge bao nhiêu điểm thì cộng bấy nhiêu (giá trị tile mới)
-
-### Save/Load System
-- Lưu board state qua `BoardData` (int array) → JSON → PlayerPrefs
-- Old board state cho Undo (1 bước)
-- Auto-save khi về Home, khi thoát PlayMode Editor
-- Load board khi Start nếu có save data
-
-### Undo System
-- Lưu `oldValue` trong mỗi Cell trước khi move
-- Undo: restore từng Cell về oldValue, trừ turnScore
-- Chỉ undo được 1 bước
-
-### Input System (`InputManager.cs`)
-- Input: 4 phím mũi tên → direction vector
-- Không xử lý khi có popup hoặc animation đang chạy
-
-## 5. Content Design
-
-### Tile States (ScriptableObject)
-- 14 TileState assets cho giá trị 2 → 16384
-- Mỗi state có `backgroundColor` + `textColor` — dễ dàng thêm/sửa màu
-
-### Grid Configurations
-- 4x4 (mặc định) — chuẩn classic
-- 5x5 — harder variant, kéo dài game
-
-## 6. Monetization
-
-**Hiện tại**: chưa có monetization — game free, không quảng cáo, không IAP.
-
-**Đề xuất**:
-- Quảng cáo banner khi ở menu / interstitial giữa các game
-- Mua skin màu sắc / theme cho tile
-- Undo bằng cách xem quảng cáo (hiện tại undo free)
-
-## 7. Retention
-
-**Hiện tại**: chưa có hệ thống retention.
-
-**Đề xuất**:
-- Daily challenge: grid khác nhau mỗi ngày (3x3, 6x6, obstacle cells)
-- Weekly leaderboard: điểm cao nhất trong tuần
-- Achievement system: "merge 10 tiles trong 1 lượt", "đạt 4096", "chơi 100 game"
-- Endless mode: tiếp tục chơi sau 2048, đếm score tối đa
-
-## 8. Technical Notes
-
-| Aspect | Detail |
-|--------|--------|
-| **Engine** | Unity 2021.3+, .NET Standard 2.1 |
-| **UI** | TextMeshPro, Canvas-based |
-| **Save** | PlayerPrefs (JSON serialization) |
-| **Animation** | Lerp movement coroutine (0.1s), Animator cho merge scale effect |
-| **Design Patterns** | Singleton, Observer, Object Pool, State (ScriptableObject), MVC |
-| **Grid Data** | int array, 1D mapped to 2D |
-| **Known Issues** | Undo 1 bước, không interrupt animation, không touch input |
-
-## 9. MVP Scope
-
-| Priority | Feature |
-|----------|---------|
-| **Must Have** | Grid 4x4, move/merge, score, win/lose, restart |
-| **Has (current)** | Undo, 5x5, auto-save, high score, tile animations |
-| **Nice To Have** | Touch/swipe input, sound effects, settings menu |
-| **Future** | Daily challenge, leaderboard, achievements, themes |
+| Item            | Description                        |
+| --------------- | ---------------------------------- |
+| Project Name    | 2048                               |
+| Genre           | Puzzle / Casual                    |
+| Platform        | PC (Unity)                         |
+| Target Audience | Casual players, puzzle enthusiasts |
+| Session Length  | 2–10 phút                          |
 
 ---
 
-## Review & Đánh giá
+# 1. Game Overview
 
-| Tiêu chí | Điểm |
-|----------|------|
-| **Market Fit** | 8/10 — 2048 đã proven, bản Unity này ổn nhưng thiếu touch input cho mobile |
-| **Innovation** | 4/10 — faithful clone, chưa có twist riêng |
-| **Production Risk** | 2/10 — code đã hoàn chỉnh, rủi ro thấp |
-| **Monetization Potential** | 3/10 — cần thêm feature để monetize |
+## Game Concept
 
-## Next Development Steps
+2048 là một trò chơi giải đố sử dụng các ô số trên bàn cờ. Người chơi di chuyển toàn bộ các ô theo bốn hướng để gộp những ô có cùng giá trị, từ đó tạo ra các ô có giá trị lớn hơn.
 
-1. **Touch/swipe input** — priority #1 để port lên mobile
-2. **Sound effects + music** — tăng immersion
-3. **Tile merge animation** — hiện tại chỉ scale, có thể thêm particle
-4. **Achievement system** — tăng retention
-5. **Mobile build** — Android/iOS với responsive UI
-6. **Twist feature** — như gravity mode, timer mode, obstacle cells
+Mục tiêu chính là tạo được ô số **2048**, đồng thời đạt điểm số cao nhất có thể trước khi không còn nước đi.
+
+## Core Experience
+
+Mang đến trải nghiệm đơn giản, dễ học nhưng có chiều sâu chiến thuật. Người chơi liên tục đưa ra quyết định về vị trí và hướng di chuyển nhằm tối ưu không gian trên bàn cờ và đạt được các giá trị số lớn hơn.
+
+## Key Features
+
+* Gameplay điều khiển bằng bốn hướng di chuyển.
+* Cơ chế gộp số trực quan và dễ hiểu.
+* Hệ thống điểm số và lưu điểm cao nhất.
+* Chế độ Undo cho phép hoàn tác một lượt di chuyển.
+* Hỗ trợ nhiều kích thước bàn chơi.
+
+---
+
+# 2. Core Gameplay
+
+## Gameplay Loop
+
+1. Người chơi chọn hướng di chuyển.
+2. Tất cả tile trên bàn cờ trượt theo hướng đã chọn.
+3. Các tile cùng giá trị sẽ được gộp lại.
+4. Một tile mới xuất hiện tại vị trí ngẫu nhiên.
+5. Người chơi tiếp tục thực hiện các lượt đi tiếp theo.
+
+## Session Flow
+
+### Main Menu
+
+* Bắt đầu trò chơi.
+* Chọn kích thước bàn chơi.
+* Xem điểm cao nhất.
+
+### Gameplay
+
+* Di chuyển tile.
+* Gộp số.
+* Tích lũy điểm số.
+* Sử dụng Undo khi cần.
+
+### End Game
+
+* Hiển thị kết quả.
+* Cập nhật điểm cao nhất.
+* Chơi lại hoặc quay về menu.
+
+## Win Condition
+
+Người chơi tạo thành công tile có giá trị **2048**.
+
+## Lose Condition
+
+Không còn ô trống và không còn cặp tile nào có thể gộp được.
+
+---
+
+# 3. Core Systems
+
+## Grid System
+
+Bàn chơi được xây dựng dưới dạng lưới vuông.
+
+Các kích thước hiện có:
+
+* 4×4 (mặc định)
+* 5×5 (nâng cao)
+
+Mỗi ô trên bàn chơi có thể chứa tối đa một tile.
+
+## Movement System
+
+Người chơi sử dụng các phím điều hướng để di chuyển toàn bộ tile theo một hướng.
+
+Các tile sẽ:
+
+* Trượt đến vị trí xa nhất có thể.
+* Dừng lại khi gặp tile khác hoặc mép bàn cờ.
+
+## Merge System
+
+Khi hai tile có cùng giá trị va chạm:
+
+* Chúng sẽ hợp nhất thành một tile mới.
+* Giá trị tile mới bằng tổng giá trị của hai tile cũ.
+* Mỗi tile chỉ được gộp một lần trong một lượt di chuyển.
+
+Ví dụ:
+
+| Tile A | Tile B | Result |
+| ------ | ------ | ------ |
+| 2      | 2      | 4      |
+| 4      | 4      | 8      |
+| 8      | 8      | 16     |
+
+## Tile Spawn System
+
+Sau mỗi lượt di chuyển hợp lệ:
+
+* Một tile mới xuất hiện tại vị trí trống ngẫu nhiên.
+* Giá trị tile mới thường là 2 hoặc 4.
+
+---
+
+# 4. Scoring System
+
+Người chơi nhận điểm khi thực hiện gộp tile.
+
+Điểm nhận được bằng giá trị của tile mới tạo ra.
+
+Ví dụ:
+
+| Merge | Score Earned |
+| ----- | ------------ |
+| 2 + 2 | +4           |
+| 4 + 4 | +8           |
+| 8 + 8 | +16          |
+
+## High Score
+
+Điểm cao nhất được lưu lại để người chơi cạnh tranh với thành tích của chính mình trong các phiên chơi tiếp theo.
+
+---
+
+# 5. Progression
+
+## Difficulty Options
+
+### 4×4 Grid
+
+* Chế độ mặc định.
+* Dễ tiếp cận.
+* Phù hợp với người chơi mới.
+
+### 5×5 Grid
+
+* Nhiều không gian hơn.
+* Ván chơi kéo dài hơn.
+* Yêu cầu quản lý bàn cờ tốt hơn.
+
+## Player Motivation
+
+* Đạt tile 2048.
+* Chinh phục các tile cao hơn như 4096 hoặc 8192.
+* Cải thiện điểm số cá nhân.
+* Hoàn thành bàn chơi với số lượt ít nhất có thể.
+
+---
+
+# 6. Save System
+
+Dữ liệu được lưu cục bộ để hỗ trợ tiếp tục ván chơi.
+
+Thông tin được lưu:
+
+* Trạng thái bàn chơi.
+* Điểm hiện tại.
+* Điểm cao nhất.
+* Kích thước bàn chơi đang sử dụng.
+
+Người chơi có thể tiếp tục phiên chơi trước đó sau khi mở lại trò chơi.
+
+---
+
+# 7. Undo System
+
+Người chơi có thể hoàn tác một lượt di chuyển gần nhất.
+
+## Mục đích
+
+* Giảm cảm giác bị phạt vì thao tác sai.
+* Hỗ trợ người chơi mới học game.
+* Tạo thêm cơ hội tối ưu chiến thuật.
+
+Hiện tại hệ thống chỉ hỗ trợ hoàn tác một bước.
+
+---
+
+# 8. Visual Direction
+
+## Art Style
+
+* Thiết kế tối giản.
+* Màu sắc rõ ràng và dễ phân biệt.
+* Giao diện tập trung vào khả năng đọc thông tin.
+
+## Tile Design
+
+Mỗi giá trị tile sẽ có màu sắc riêng giúp người chơi dễ dàng nhận biết mức độ tiến triển.
+
+Ví dụ:
+
+* 2
+* 4
+* 8
+* 16
+* 32
+* 64
+* 128
+* 256
+* 512
+* 1024
+* 2048
+
+## Feedback
+
+* Animation khi tile di chuyển.
+* Animation khi merge.
+* Hiển thị điểm số được cộng thêm.
+* Hiệu ứng chiến thắng khi đạt 2048.
+
+---
+
+# 9. MVP Scope
+
+## Must Have
+
+* Grid 4×4
+* Tile Movement
+* Tile Merge
+* Random Tile Spawn
+* Score System
+* Win/Lose Condition
+* Restart Game
+
+## Additional Features
+
+* Undo System
+* High Score Save
+* Multiple Grid Sizes
+* Auto Save
+
+## Nice To Have
+
+* Sound Effects
+* Background Music
+* Settings Menu
+* Touch/Swipe Controls
+
+---
+
+# 10. Future Improvements
+
+## Mobile Support
+
+Bổ sung điều khiển bằng thao tác vuốt để hỗ trợ Android và iOS.
+
+## Achievement System
+
+Ví dụ:
+
+* Đạt tile 2048.
+* Đạt tile 4096.
+* Chơi 100 trận.
+* Đạt 10.000 điểm.
+
+## Daily Challenge
+
+Cung cấp thử thách mới mỗi ngày với luật chơi hoặc kích thước bàn cờ khác nhau.
+
+## Leaderboard
+
+Cho phép người chơi cạnh tranh điểm số với cộng đồng thông qua bảng xếp hạng trực tuyến.
+
+## Themes & Customization
+
+Bổ sung các giao diện khác nhau cho:
+
+* Tile
+* Background
+* Board
+* UI
+
+## Endless Mode
+
+Sau khi tạo được tile 2048, người chơi có thể tiếp tục chơi để đạt các mốc cao hơn như 4096, 8192 hoặc xa hơn nữa.
